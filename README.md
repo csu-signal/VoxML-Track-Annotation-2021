@@ -15,7 +15,8 @@ step 4: Download project folder from GitHub
 
 step 5: Open Project from VS code editor
 
-step 6: From VS terminal Run '
+step 6: From VS terminal run
+
          expo start
 
 By running step 6 it would redirect to web browser and on the left side panel Click on "RUN ON WEB BROWSER"
