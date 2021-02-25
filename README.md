@@ -1,7 +1,7 @@
 # VoxML-Track-Annotation-2021
 step 1: Install Node.js from the below link 
 
-         'https://nodejs.org/en/download/'
+         https://nodejs.org/en/download/
          
 step 2: Download Expo : 
 
@@ -9,7 +9,7 @@ step 2: Download Expo :
          
 step 3: Download VS Studio:
 
-        'https://code.visualstudio.com/download'
+        https://code.visualstudio.com/download
         
 step 4: Download project folder from GitHub
 
