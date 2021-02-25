@@ -2,18 +2,22 @@ import { StatusBar } from 'expo-status-bar';
 import React,{Component} from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import {TextInput, Button} from 'react-native-paper';
-import {fbInitializeApp,getfirebasedb} from "./config";
+import {fbInitializeApp,getfirebasedb,fbAuthenticated} from "./config";
 
-//var firebase;
+var firebase;
 class  App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {count:1};
+    this.state = {
+      count:1,
+      captionText:'',
+      FocusActivityText:''
+    };
   }
 
   componentDidMount() {
-    console.log("Expo component mount");
+    fbAuthenticated();
   }
 
 render(){
@@ -39,18 +43,33 @@ render(){
     
     <View style={styles.container}>
       <Text style={styles.titleText}>VoxML Annotation Survey</Text>
-      <Image style={styles.tinyLogo} source={require('./Images/'+Math.floor(Math.random() * Math.floor(104))+'.jpg')} />
+      <Image style={styles.tinyLogo} source={require('./Images/'+1+'.jpg')} />
       <TextInput
         mode='flat'
         label="Caption"
+        onChangeText={(text)=>{
+          this.setState({captionText: text})
+        }}
       />
       <TextInput
         mode='flat'
         label="Focus Activity"
+        onChangeText={(text)=>{
+          this.setState({FocusActivityText: text})
+        }}
       />
       <View >
         { objects }
-        <Button  mode="contained" >
+        <Button  mode="contained" onPress={
+          ()=>{
+            getfirebasedb().ref('/users/1232')
+            .set({
+              Caption: this.state.captionText,
+              FocusActivitiy: this.state.FocusActivityText,
+            })
+            .then(() => console.log('Data set.'));
+          }
+        }>
         Submit
         </Button>
       </View>
