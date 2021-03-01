@@ -2,11 +2,12 @@ import { StatusBar } from 'expo-status-bar';
 import React,{Component} from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import {TextInput, Button} from 'react-native-paper';
-import {fbInitializeApp,getfirebasedb,fbAuthenticated} from "./config";
+import {getfirebasedb,fbAuthenticated} from "./config";
 
 var firebase;
 var objectsArray = [];
 var depictedActivityArray = [];
+var changeInCircumstancesArray = [];
 class  App extends Component {
 
   constructor(props) {
@@ -29,25 +30,30 @@ render(){
 		objects.push(
       <>
 			<View  style={{
-        flexDirection: 'row',margin:5}} key = {i}>
+        flexDirection: 'row',margin:5,}} key = {i}>
 				<TextInput
-          style={{margin:20}}
+          style={{width:250,margin:20}}
           mode='flat'
           label="Object"
           onChangeText={(text)=>{objectsArray[i]=text}}
         />
         <TextInput
-        style={{margin:20}}
+        style={{width:250,margin:20}}
         mode='flat'
-        label="Depicted Activity"
+        label="Associated Depicted Activity"
         onChangeText={(text)=>{depictedActivityArray[i]=text}}
         />
+        <Button mode="contained"  
+        color="#457b9d" 
+        style={{margin:20,alignContent:'center',justifyContent: 'center'}}
+        onPress={() =>{
+                this.setState(prevState => {
+                return {count: prevState.count + 1} }) }}
+        >
+        Add More
+        </Button>
 			</View>
-      <Button icon="plus" mode="contained"  color="blue" style={{width:50,height:50,alignContent:'center'}}
-      onPress={() =>{
-      this.setState(prevState => {
-      return {count: prevState.count + 1} }) }}>
-      </Button>
+      
       </>
 		)
 	}
@@ -59,13 +65,15 @@ render(){
       <Text style={styles.titleText}>VoxML Annotation Survey</Text>
       <Image style={styles.tinyLogo} source={require('./Images/'+1+'.jpg')} />
       <TextInput
+        style={{width:500,margin:20}}
         mode='flat'
-        label= "caption"
+        label= "Caption"
         onChangeText={(text)=>{
           this.setState({captionText: text})
         }}
       />
       <TextInput
+        style={{width:500,margin:20}}
         mode='flat'
         label="Focus Activity"
         onChangeText={(text)=>{
@@ -74,17 +82,17 @@ render(){
       />
       <View >
         { objects }
-        <Text style={styles.headerText}>Change in circumstances</Text>
+        {/* <Text style={styles.headerText}>Change in circumstances</Text> */}
  
          { objectsArray.map((item, key)=>(
            	<View  style={{
               flexDirection: 'row',margin:5}}>
-         <Text key={key} style={styles.TextStyle}> To {depictedActivityArray[key]} { objectsArray[key] } must </Text>
+         <Text key={key} style={styles.TextStyle}> To {depictedActivityArray[key]}, { objectsArray[key] } must </Text>
         
          <TextInput
           mode='flat'
           label="Action"
-         
+          onChangeText={(text)=>{changeInCircumstancesArray[key]=text}}
         />
         </View>
 
@@ -101,6 +109,8 @@ render(){
               Caption: this.state.captionText,
               FocusActivitiy: this.state.FocusActivityText,
               Objects: JSON.stringify(objectsArray),
+              depictedActivity: JSON.stringify(depictedActivityArray),
+              changeInCircumstances: JSON.stringify(changeInCircumstancesArray),
             })
             .then(() => console.log('Data set.'));
           }
