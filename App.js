@@ -7,15 +7,19 @@ import {getfirebasedb,fbAuthenticated} from "./config";
 var objectsArray = [];
 var depictedActivityArray = [];
 var changeInCircumstancesArray = [];
+var spatialActivitiesArray = [];
 class  App extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       image_id:0,
-      count:1,
+      objectCount:1,
+      spatialActivitiesCount:1,
       captionText:'',
-      FocusActivityText:''
+      FocusActivityText:'',
+      objectsText:[],
+      activityText:[],
     };
   }
 
@@ -28,7 +32,8 @@ class  App extends Component {
 render(){
 
   var objects = [];
-	for(let i = 0; i < this.state.count; i++){
+  var spatialActivities = [];
+	for(let i = 0; i < this.state.objectCount; i++){
 		objects.push(
       <>
 			<View  style={{
@@ -37,12 +42,28 @@ render(){
           style={{width:250,margin:20}}
           mode='flat'
           label="Object"
-          onChangeText={(text)=>{objectsArray[i]=text}}
+          onChangeText={(text)=>{
+            this.setState({
+                objectsText: [...this.state.objectsText, text]
+            })
+            objectsArray[i]=text
+          }}
         />
         <TextInput
         style={{width:250,margin:20}}
         mode='flat'
         label="Associated Depicted Activity"
+        onChangeText={(text)=>{
+          this.setState({
+                objectsText: [...this.state.objectsText, text]
+            })
+          depictedActivityArray[i]=text
+        }}
+        />
+        <TextInput
+        style={{width:250,margin:20}}
+        mode='flat'
+        label={"To "+this.state.activityText[i]+", "+this.state.objectsText[i]+" must"} 
         onChangeText={(text)=>{depictedActivityArray[i]=text}}
         />
         <Button mode="contained"  
@@ -50,7 +71,7 @@ render(){
         style={{margin:20,alignContent:'center',justifyContent: 'center'}}
         onPress={() =>{
                 this.setState(prevState => {
-                return {count: prevState.count + 1} }) }}
+                return {objectCount: prevState.objectCount + 1} }) }}
         >
         Add More
         </Button>
@@ -59,7 +80,34 @@ render(){
       </>
 		)
 	}
+  for(let i = 0; i < this.state.spatialActivitiesCount; i++){
+		spatialActivities.push(
+      <>
+			<View  style={{
+        flexDirection: 'row',margin:5,}} key = {i}>
 
+				<TextInput
+        style={{width:500,margin:20}}
+        mode='flat'
+        label="Spatial Activity"
+        onChangeText={(text)=>{
+          spatialActivitiesArray[i] = text;
+        }}
+      />
+        <Button mode="contained"  
+        color="#457b9d" 
+        style={{margin:20,alignContent:'center',justifyContent: 'center'}}
+        onPress={() =>{
+                this.setState(prevState => {
+                return {spatialActivitiesCount: prevState.spatialActivitiesCount + 1} }) }}
+        >
+        Add More
+        </Button>
+			</View>
+      
+      </>
+		)
+	}
 
   return (
     
@@ -73,7 +121,7 @@ render(){
         onChangeText={(text)=>{
           this.setState({captionText: text})
         }}
-      />c
+      />
       <TextInput
         style={{width:500,margin:20}}
         mode='flat'
@@ -84,24 +132,7 @@ render(){
       />
       <View >
         { objects }
-        {/* <Text style={styles.headerText}>Change in circumstances</Text> */}
- 
-         { objectsArray.map((item, key)=>(
-           	<View  style={{
-              flexDirection: 'row',margin:5}}>
-         <Text key={key} style={styles.TextStyle}> To {depictedActivityArray[key]}, { objectsArray[key] } must </Text>
-        
-         <TextInput
-          mode='flat'
-          label="Action"
-          onChangeText={(text)=>{changeInCircumstancesArray[key]=text}}
-        />
-        </View>
-
-
-         )
-         )}
-        
+        { spatialActivities }
       </View>
       <View>
       <Button mode="contained"  
