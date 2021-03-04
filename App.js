@@ -4,7 +4,6 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import {TextInput, Button} from 'react-native-paper';
 import {getfirebasedb,fbAuthenticated} from "./config";
 
-var firebase;
 var objectsArray = [];
 var depictedActivityArray = [];
 var changeInCircumstancesArray = [];
@@ -13,6 +12,7 @@ class  App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      image_id:0,
       count:1,
       captionText:'',
       FocusActivityText:''
@@ -20,8 +20,10 @@ class  App extends Component {
   }
 
   componentDidMount() {
+    this.setState({image_id: Math.floor(Math.random() * Math.floor(105))})
     fbAuthenticated();
   }
+
 
 render(){
 
@@ -63,7 +65,7 @@ render(){
     
     <View style={styles.container}>
       <Text style={styles.titleText}>VoxML Annotation Survey</Text>
-      <Image style={styles.tinyLogo} source={require('./Images/'+1+'.jpg')} />
+      <Image style={styles.tinyLogo} source={require('./Images/'+this.state.image_id+'.jpg')} />
       <TextInput
         style={{width:500,margin:20}}
         mode='flat'
@@ -71,7 +73,7 @@ render(){
         onChangeText={(text)=>{
           this.setState({captionText: text})
         }}
-      />
+      />c
       <TextInput
         style={{width:500,margin:20}}
         mode='flat'
@@ -102,9 +104,12 @@ render(){
         
       </View>
       <View>
-      <Button  mode="contained" onPress={
+      <Button mode="contained"  
+        color="#457b9d" 
+        style={{margin:20,alignContent:'center',justifyContent: 'center'}}
+        onPress={
           ()=>{
-            getfirebasedb().ref('/users/1232')
+            getfirebasedb().ref('/Image/'+this.state.image_id)
             .set({
               Caption: this.state.captionText,
               FocusActivitiy: this.state.FocusActivityText,
@@ -117,7 +122,15 @@ render(){
         }>
         Submit
         </Button>
-        <Button  mode="contained">
+        <Button  mode="contained"  
+        color="#457b9d"
+        onPress={()=>{
+          objectsArray = [];
+          depictedActivityArray = [];
+          changeInCircumstancesArray = [];
+          this.setState({image_id: Math.floor(Math.random() * Math.floor(105))})
+        }}
+        style={{margin:20,alignContent:'center',justifyContent: 'center'}}>
         Next
         </Button>
       </View>
