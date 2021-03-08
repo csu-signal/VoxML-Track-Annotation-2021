@@ -8,7 +8,7 @@ import update from 'react-addons-update';
 class  App extends Component {
 
   constructor(props) {
-    
+
     super(props);
     this.state = {
       image_id:0,
@@ -43,10 +43,37 @@ hasErrors = (text) => {
     return false;
 };
 
-render(){
+removeObject = (i) => {
+     var tempArray = this.state.objectsText;
+     var tempArray2 = this.state.activityText;
+     var tempArray3= this.state.changeInCircumstancesText;
+     tempArray.splice(i,1);
+     tempArray2.splice(i,1);
+     tempArray3.splice(i,1);
+    this.setState({
+	                objectsText: tempArray,
+                  actText: tempArray2,
+                  changeInCircumstancesText: tempArray3,
+    });
+     this.setState(prevState => {
+          return {objectCount: prevState.objectCount - 1} 
+    });
+};
 
-  var objects = [];
-  var spatialActivities = [];
+removeSpatialActivity = (i) => {
+     var tempArray = this.state.spatialActivityText;
+     tempArray.splice(i,1);
+    this.setState({
+	      spatialActivityText: tempArray,
+    });
+     this.setState(prevState => {
+        return {spatialActivitiesCount: prevState.spatialActivitiesCount - 1} 
+    });
+};
+
+render(){
+var spatialActivities = [];
+var objects = [];
 	for(let i = 0; i < this.state.objectCount; i++){
 		objects.push(
       <>
@@ -69,7 +96,7 @@ render(){
           }}
           value = {this.state.objectsText[i]}
         />
-        <HelperText type="error" visible={this.hasErrors(this.state.objectsText[i])}>
+        <HelperText type= "error" visible={this.hasErrors(this.state.objectsText[i])}>
               Empty Text
         </HelperText>
         </>
@@ -112,19 +139,29 @@ render(){
         Empty Text
         </HelperText>
         <Button mode="contained"  
-        color="#457b9d" 
+        color={(i == (this.state.objectCount-1))?"#457b9d":"#a41726"}
         style={{margin:20,alignContent:'center',justifyContent: 'center'}}
         onPress={() =>{
-                this.setState(prevState => {
-                return {objectCount: prevState.objectCount + 1} }) }}
+                  (i == (this.state.objectCount-1))?(
+                    this.setState(prevState => {
+                      return {objectCount: prevState.objectCount + 1} }) 
+                    ):(
+                         this.removeObject(i)
+                    )
+                 
+                 
+              }}
         >
-        Add More
+        {(i == (this.state.objectCount-1))?"Add More":"Remove"}
         </Button>
 			</View>
       
       </>
 		)
 	}
+
+  
+
   for(let i = 0; i < this.state.spatialActivitiesCount; i++){
 		spatialActivities.push(
       <>
@@ -146,13 +183,18 @@ render(){
          value = {this.state.spatialActivityText[i]}
       />
         <Button mode="contained"  
-        color="#457b9d" 
+        color={(i == (this.state.spatialActivitiesCount-1))?"#457b9d":"#a41726"}
         style={{margin:20,alignContent:'center',justifyContent: 'center'}}
-        onPress={() =>{
-                this.setState(prevState => {
-                return {spatialActivitiesCount: prevState.spatialActivitiesCount + 1} }) }}
+         onPress={() =>{
+                  (i == (this.state.spatialActivitiesCount-1))?(
+                    this.setState(prevState => {
+                      return {spatialActivitiesCount: prevState.spatialActivitiesCount + 1} }) 
+                    ):(
+                         this.removeSpatialActivity(i)
+                    ) 
+              }}
         >
-        Add More
+        {(i == (this.state.spatialActivitiesCount-1))? "Add More" : "Remove"}
         </Button>
 			</View>
       
@@ -216,8 +258,8 @@ render(){
         color="#457b9d"
         onPress={
           ()=>{
-            
-          this.setState({
+           
+           this.setState({
             image_id: Math.floor(Math.random() * Math.floor(105)),
             objectCount:1,
             spatialActivitiesCount:1,
