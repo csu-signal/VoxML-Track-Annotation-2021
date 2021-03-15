@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React,{Component,createRef} from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
-import {TextInput, Button,HelperText} from 'react-native-paper';
+import {TextInput, Button,HelperText,Checkbox} from 'react-native-paper';
 import {getfirebasedb,fbAuthenticated} from "./config";
 import update from 'react-addons-update';
 
@@ -21,6 +21,7 @@ class  App extends Component {
       onSubmit:false,
       tempObject:'',
       similarObject:false,
+      checked:[false]
     };
     
   }
@@ -80,7 +81,6 @@ var objects = [];
 			<View  style={{
         flexDirection: 'row',margin:5,}} key = {i}>
           <>
-          {console.log(this.state.tempObject)}
 				<TextInput
           style={{width:250,margin:20}}
           mode='flat'
@@ -116,7 +116,7 @@ var objects = [];
         <TextInput
         style={{width:250,margin:20}}
         mode='flat'
-        label="Associated Depicted Activity"
+        label="Associated Activity"
         onChangeText={(text)=>{
           this.setState(update(this.state, {
 	                activityText: {
@@ -128,6 +128,19 @@ var objects = [];
         }}
         value = {this.state.activityText[i]}
         />
+        {console.log(this.state.tempObject)}
+        <Checkbox
+            status={this.state.checked[i] ? 'checked' : 'unchecked'}
+            onPress={() => {
+              this.setState(update(this.state, {
+	                checked: {
+		                          [i]: {
+			                            $set: (this.state.checked[i] == null)?false:!this.state.checked[i]
+	                          	  }
+	                            }
+               })) 
+            }}
+        />
         <HelperText type="error" visible={this.hasErrors(this.state.activityText[i])}>
         Empty Text
         </HelperText>
@@ -137,6 +150,7 @@ var objects = [];
         label={
             this.renameLabel(i)
         }
+        disabled = {!this.state.checked[i]}
         onChangeText={(text)=>{
           this.setState(update(this.state, {
 	                changeInCircumstancesText: {
