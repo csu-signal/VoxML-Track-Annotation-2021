@@ -6,9 +6,7 @@ import {getfirebasedb,fbAuthenticated} from "./config";
 import update from 'react-addons-update';
 
 class  App extends Component {
-
-  constructor(props) {
-
+  constructor(props) {  
     super(props);
     this.state = {
       image_id:0,
@@ -21,6 +19,8 @@ class  App extends Component {
       changeInCircumstancesText:[''],
       spatialActivityText:[''],
       onSubmit:false,
+      tempObject:'',
+      similarObject:false,
     };
     
   }
@@ -80,26 +80,39 @@ var objects = [];
 			<View  style={{
         flexDirection: 'row',margin:5,}} key = {i}>
           <>
+          {console.log(this.state.tempObject)}
 				<TextInput
           style={{width:250,margin:20}}
           mode='flat'
           label="Object"
           onChangeText={(text)=>{
-            this.setState(update(this.state, {
+            (this.state.similarObject ? (
+              this.setState(update(this.state, {
+	                objectsText: {
+		                          [i]: {
+			                            $set: this.state.tempObject
+	                          	  }
+	                            }
+               }))  
+            ):(
+              this.setState(update(this.state, {
 	                objectsText: {
 		                          [i]: {
 			                            $set: text
 	                          	  }
 	                            }
-          }));
+          }))
+            ));
+            
           
           }}
-          value = {this.state.objectsText[i]}
+          value = {this.state.similarObject ? this.state.tempObject:this.state.objectsText[i]}
         />
         <HelperText type= "error" visible={this.hasErrors(this.state.objectsText[i])}>
               Empty Text
         </HelperText>
         </>
+
         <TextInput
         style={{width:250,margin:20}}
         mode='flat'
@@ -140,20 +153,38 @@ var objects = [];
         </HelperText>
         <Button mode="contained"  
         color={(i == (this.state.objectCount-1))?"#457b9d":"#a41726"}
-        style={{margin:20,alignContent:'center',justifyContent: 'center'}}
+        style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
         onPress={() =>{
                   (i == (this.state.objectCount-1))?(
                     this.setState(prevState => {
-                      return {objectCount: prevState.objectCount + 1} }) 
-                    ):(
-                         this.removeObject(i)
+                      return {
+                        similarObject:true,
+                        tempObject: this.state.objectsText[i],
+                        objectCount: prevState.objectCount + 1,
+                      } })
+                      
+                   ) :(
+                      this.removeObject(i)
                     )
-                 
-                 
               }}
         >
-        {(i == (this.state.objectCount-1))?"Add More":"Remove"}
+        {(i == (this.state.objectCount-1))?"Add similar":"Remove"}
         </Button>
+        {(i == (this.state.objectCount-1))?
+        <Button mode="contained"  
+        color={(i == (this.state.objectCount-1))?"#457b9d":"#a41726"}
+        style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
+        onPress={() =>{
+                  (i == (this.state.objectCount-1))?(
+                    this.setState(prevState => {
+                      return {objectCount: prevState.objectCount + 1, similarObject:false} }) 
+                    ):(
+                         this.removeObject(i)
+                  )
+              }}
+        >
+        {(i == (this.state.objectCount-1))?"Add Object":"Remove Object"}
+        </Button>:<></>}
 			</View>
       
       </>
@@ -207,6 +238,11 @@ var objects = [];
     <View style={styles.container}>
       <Text style={styles.titleText}>VoxML Annotation Survey</Text>
       <Image style={styles.tinyLogo} source={require('./Images/'+this.state.image_id+'.jpg')} />
+      <View style={{width:500}}>
+        <Text style={{fontSize: 20,marginLeft:5,marginTop:20}}>
+        text1
+        </Text>
+      </View>
       <TextInput
         // ref={(ref) => this.mainInput= ref}
         ref={input => { this.textRef = input }}
@@ -218,6 +254,11 @@ var objects = [];
         }}
         value={this.state.captionText}
       />
+      <View style={{width:500}}>
+        <Text style={{fontSize: 20,marginLeft:5,marginTop:20}}>
+        text2
+        </Text>
+      </View>
       <TextInput
         style={{width:500,margin:20}}
         mode='flat'
@@ -228,7 +269,13 @@ var objects = [];
         value={this.state.FocusActivityText}
       />
       <View >
+        <Text style={{fontSize: 20, paddingLeft:25,}}>
+          text3
+        </Text>
         { objects }
+        <Text style={{fontSize: 20,paddingLeft:25,}}>
+          text4
+        </Text>
         { spatialActivities }
       </View>
       <View>
