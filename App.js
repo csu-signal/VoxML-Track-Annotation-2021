@@ -21,7 +21,7 @@ class  App extends Component {
       onSubmit:false,
       tempObject:'',
       similarObject:false,
-      checked:[false]
+      checked:[]
     };
     
   }
@@ -33,7 +33,7 @@ class  App extends Component {
 
 renameLabel=(i)=> {
   var actText = this.state.activityText[i]?this.state.activityText[i]:"Activity";
-  var objText = this.state.objectsText[i]?this.state.objectsText[i]:"Object";
+  var objText = this.state.similarObject ? this.state.tempObject:(this.state.objectsText[i]?this.state.objectsText[i]:"Object");
   return ("To <"+actText+">, <"+objText+"> must");
 }
 
@@ -128,14 +128,13 @@ var objects = [];
         }}
         value = {this.state.activityText[i]}
         />
-        {console.log(this.state.tempObject)}
         <Checkbox
             status={this.state.checked[i] ? 'checked' : 'unchecked'}
             onPress={() => {
               this.setState(update(this.state, {
 	                checked: {
 		                          [i]: {
-			                            $set: (this.state.checked[i] == null)?false:!this.state.checked[i]
+			                            $set: !this.state.checked[i]
 	                          	  }
 	                            }
                })) 
@@ -151,7 +150,7 @@ var objects = [];
         label={
             this.renameLabel(i)
         }
-        disabled = {this.state.checked[i]}
+        disabled = {!this.state.checked[i]}
         onChangeText={(text)=>{
           this.setState(update(this.state, {
 	                changeInCircumstancesText: {
@@ -205,8 +204,6 @@ var objects = [];
       </>
 		)
 	}
-
-  
 
   for(let i = 0; i < this.state.spatialActivitiesCount; i++){
 		spatialActivities.push(
