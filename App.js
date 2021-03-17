@@ -34,7 +34,7 @@ class  App extends Component {
 renameLabel=(i)=> {
   var actText = this.state.activityText[i]?this.state.activityText[i]:"Activity";
   var objText = this.state.objectsText[i]?this.state.objectsText[i]:"Object";
-  return ("To "+actText+", "+objText+" must");
+  return ("To <"+actText+">, <"+objText+"> must");
 }
 
 hasErrors = (text) => {
@@ -141,6 +141,7 @@ var objects = [];
                })) 
             }}
         />
+        Shown In Scene
         <HelperText type="error" visible={this.hasErrors(this.state.activityText[i])}>
         Empty Text
         </HelperText>
@@ -150,7 +151,7 @@ var objects = [];
         label={
             this.renameLabel(i)
         }
-        disabled = {!this.state.checked[i]}
+        disabled = {this.state.checked[i]}
         onChangeText={(text)=>{
           this.setState(update(this.state, {
 	                changeInCircumstancesText: {
@@ -182,7 +183,7 @@ var objects = [];
                     )
               }}
         >
-        {(i == (this.state.objectCount-1))?"Add similar":"Remove"}
+        {(i == (this.state.objectCount-1))?"Add activity":"Remove"}
         </Button>
         {(i == (this.state.objectCount-1))?
         <Button mode="contained"  
@@ -215,7 +216,7 @@ var objects = [];
 				<TextInput
         style={{width:500,margin:20}}
         mode='flat'
-        label="Spatial Activity"
+        label="Spatial Relation"
         onChangeText={(text)=>{
           this.setState(update(this.state, {
 	                spatialActivityText: {
@@ -254,7 +255,7 @@ var objects = [];
       <Image style={styles.tinyLogo} source={require('./Images/'+this.state.image_id+'.jpg')} />
       <View style={{width:500}}>
         <Text style={{fontSize: 20,marginLeft:5,marginTop:20}}>
-        text1
+        Provide a brief caption of the image.
         </Text>
       </View>
       <TextInput
@@ -270,7 +271,7 @@ var objects = [];
       />
       <View style={{width:500}}>
         <Text style={{fontSize: 20,marginLeft:5,marginTop:20}}>
-        text2
+        What activity (if any) is the focus of the scene?
         </Text>
       </View>
       <TextInput
@@ -284,11 +285,15 @@ var objects = [];
       />
       <View >
         <Text style={{fontSize: 20, paddingLeft:25,}}>
-          text3
+          Identify the objects/entities in the scene (including people and animals).<br />
+          For each entity, add activities associated with that object. <br />
+          Check the "Shown In Scene" box if the listed activity is depicted in the image.<br />
+          Otherwise, use the next field to indicate what would need to change for that activity to be possible.
         </Text>
         { objects }
         <Text style={{fontSize: 20,paddingLeft:25,}}>
-          text4
+          Identify the major spatial and configurational relations between entities in the scene.<br />
+          See the provided guideline for sample relations.
         </Text>
         { spatialActivities }
       </View>
