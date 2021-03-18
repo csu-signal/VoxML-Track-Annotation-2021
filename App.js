@@ -32,9 +32,9 @@ class  App extends Component {
   }
 
 renameLabel=(i)=> {
-  var actText = this.state.activityText[i]?this.state.activityText[i]:"Activity";
-  var objText = this.state.similarObject ? this.state.tempObject:(this.state.objectsText[i]?this.state.objectsText[i]:"Object");
-  return ("To <"+actText+">, <"+objText+"> must");
+  var actText = this.state.activityText[i]?this.state.activityText[i]:"<Activity>";
+  var objText = this.state.similarObject ? this.state.tempObject:(this.state.objectsText[i]?this.state.objectsText[i]:"<Object>");
+  return ("To "+actText+", "+objText+" must");
 }
 
 hasErrors = (text) => {
@@ -150,7 +150,7 @@ var objects = [];
         label={
             this.renameLabel(i)
         }
-        disabled = {!this.state.checked[i]}
+        disabled = {this.state.checked[i]}
         onChangeText={(text)=>{
           this.setState(update(this.state, {
 	                changeInCircumstancesText: {
