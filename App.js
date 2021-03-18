@@ -112,7 +112,7 @@ var objects = [];
         flexDirection: 'row',margin:5,}} key = {i}>
           <>
           <Text >{i}</Text>
-				<TextInput
+				{this.state.objectsText[i] == this.state.objectsText[i-1]? <View style={{width:250,margin:20}}></View>:(<TextInput
           style={{width:250,margin:20}}
           mode='flat'
           label="Object"
@@ -138,7 +138,7 @@ var objects = [];
           
           }}
           value = {this.state.objectsText[i]}
-        />
+        />)}
         <HelperText type= "error" visible={this.hasErrors(this.state.objectsText[i])}>
               Empty Text
         </HelperText>
@@ -181,7 +181,7 @@ var objects = [];
         label={
             this.renameLabel(i)
         }
-        disabled = {this.state.checked[i]}
+        disabled = {!this.state.checked[i]}
         onChangeText={(text)=>{
           this.setState(update(this.state, {
 	                changeInCircumstancesText: {
