@@ -5,6 +5,7 @@ import {TextInput, Button,HelperText,Checkbox} from 'react-native-paper';
 import {getfirebasedb,fbAuthenticated} from "./config";
 import update from 'react-addons-update';
 
+var similar;
 class  App extends Component {
   constructor(props) {  
     super(props);
@@ -37,6 +38,23 @@ renameLabel=(i)=> {
   return ("To "+actText+", "+objText+" must");
 }
 
+renameObjectValue=(i)=> {
+  if(similar){
+    similar = false
+    this.setState(update(this.state, {
+	                objectsText: {
+		                          [i]: {
+			                            $set: this.state.tempObject
+	                          	  }
+	                            }
+               }))
+    
+  }
+  var value = this.state.similarObject ? this.state.tempObject :this.state.objectsText[i]
+  return (value);
+}
+
+
 hasErrors = (text) => {
     if(!text && this.state.onSubmit){
       return true;
@@ -61,6 +79,18 @@ removeObject = (i) => {
     });
 };
 
+insertObject = (i) => {     
+  var tempArray = this.state.objectsText;
+  tempArray.splice(i,0,this.state.objectsText[i]);
+  this.setState({
+	  objectsText: tempArray,
+  });
+  this.setState(prevState => {
+      return {objectCount: prevState.objectCount + 1} 
+  });
+};
+
+
 removeSpatialActivity = (i) => {
      var tempArray = this.state.spatialActivityText;
      tempArray.splice(i,1);
@@ -81,6 +111,7 @@ var objects = [];
 			<View  style={{
         flexDirection: 'row',margin:5,}} key = {i}>
           <>
+          <Text >{i}</Text>
 				<TextInput
           style={{width:250,margin:20}}
           mode='flat'
@@ -106,7 +137,7 @@ var objects = [];
             
           
           }}
-          value = {this.state.similarObject ? this.state.tempObject:this.state.objectsText[i]}
+          value = {this.state.objectsText[i]}
         />
         <HelperText type= "error" visible={this.hasErrors(this.state.objectsText[i])}>
               Empty Text
@@ -169,17 +200,11 @@ var objects = [];
         color={(i == (this.state.objectCount-1))?"#457b9d":"#a41726"}
         style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
         onPress={() =>{
-                  (i == (this.state.objectCount-1))?(
-                    this.setState(prevState => {
-                      return {
-                        similarObject:true,
-                        tempObject: this.state.objectsText[i],
-                        objectCount: prevState.objectCount + 1,
-                      } })
-                      
+                  ((i == (this.state.objectCount-1))?(
+                    this.insertObject(i)
                    ) :(
                       this.removeObject(i)
-                    )
+                    ));
               }}
         >
         {(i == (this.state.objectCount-1))?"Add activity":"Remove"}
