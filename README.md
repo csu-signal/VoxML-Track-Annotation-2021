@@ -1,18 +1,12 @@
 # VoxML-Track-Annotation-2021
-step 1: Node.js and expo installation
+Step 1: Install Node.js and expo
 
- Install Node.js from the below link (Install version 12.*) higher versions have a compatability issue.
+1. Install Node.js from [this link](https://nodejs.org/en/download/) (Install version 12.x as higher versions have a compatability issue).
+2. Install Expo: `npm install --global expo-cli`
 
-         https://nodejs.org/en/download/
- Install Expo : 
+Step 2: Download this project folder from GitHub, `cd` to the project using the command line
 
-         npm install --global expo-cli
+Step 3: Run `npm install` (If this throws errors then run `sudo npm install`). 
+Step 4: Run `expo start`
 
-step 2: cd to the project in the terminal (Download project folder from GitHub)
-         
-         npm install (If shows errors then sudo npm install) 
-         
-         expo start
-
-By running step 2 it would redirect to web browser and on the left side panel Click on "RUN ON WEB BROWSER"
-
+This should open the project in a web browser.  On the left side panel click on "**Run in web browser**".
