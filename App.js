@@ -1,19 +1,22 @@
 import { StatusBar } from 'expo-status-bar';
 import React,{Component,createRef} from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
-import {TextInput, Button,HelperText,Checkbox} from 'react-native-paper';
+import {TextInput, Button,HelperText,Checkbox,Modal,Provider,Portal} from 'react-native-paper';
 import {getfirebasedb,fbAuthenticated} from "./config";
 import update from 'react-addons-update';
 
 var similar;
+const containerStyle = {alignItems:'center',backgroundColor: 'white', padding: 20, width:"100%",height:"100%"};
 class  App extends Component {
   constructor(props) {  
     super(props);
     this.state = {
+      visible:true,
       image_id:0,
       objectCount:1,
       spatialActivitiesCount:1,
       captionText:'',
+      UID:'',
       FocusActivityText:'',
       objectsText:[''],
       activityText:[''],
@@ -101,7 +104,12 @@ removeSpatialActivity = (i) => {
         return {spatialActivitiesCount: prevState.spatialActivitiesCount - 1} 
     });
 };
-
+showModal = () => {this.setState({
+  visible:true
+})};
+hideModal = () => {
+  console.log("On dismiss modal")
+};
 render(){
 var spatialActivities = [];
 var objects = [];
@@ -109,9 +117,8 @@ var objects = [];
 		objects.push(
       <>
 			<View  style={{
-        flexDirection: 'row',margin:5,}} key = {i}>
+        flexDirection: 'row',margin:5}} key = {i}>
           <>
-          <Text >{i}</Text>
 				{this.state.objectsText[i] == this.state.objectsText[i-1]? <View style={{width:250,margin:20}}></View>:(<TextInput
           style={{width:250,margin:20}}
           mode='flat'
@@ -134,8 +141,6 @@ var objects = [];
 	                            }
           }))
             ));
-            
-          
           }}
           value = {this.state.objectsText[i]}
         />)}
@@ -159,6 +164,10 @@ var objects = [];
         }}
         value = {this.state.activityText[i]}
         />
+        <View style={{alignItems:"center",justifyContent:"center"}}>
+        <Text style={{fontSize: 18,paddingLeft:25,}}>
+        Shown In Scene
+        </Text>
         <Checkbox
             status={this.state.checked[i] ? 'checked' : 'unchecked'}
             onPress={() => {
@@ -171,7 +180,7 @@ var objects = [];
                })) 
             }}
         />
-        Shown In Scene
+        </View>
         <HelperText type="error" visible={this.hasErrors(this.state.activityText[i])}>
         Empty Text
         </HelperText>
@@ -197,33 +206,19 @@ var objects = [];
         Empty Text
         </HelperText>
         <Button mode="contained"  
-        color={(i == (this.state.objectCount-1))?"#457b9d":"#a41726"}
+        color={(i == 0)?"#457b9d":"#a41726"}
         style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
         onPress={() =>{
-                  ((i == (this.state.objectCount-1))?(
+                  ((i == (0))?(
                     this.insertObject(i)
                    ) :(
                       this.removeObject(i)
                     ));
               }}
         >
-        {(i == (this.state.objectCount-1))?"Add activity":"Remove"}
+        {(i == 0)?"Add activity":"Remove"}
         </Button>
-        {(i == (this.state.objectCount-1))?
-        <Button mode="contained"  
-        color={(i == (this.state.objectCount-1))?"#457b9d":"#a41726"}
-        style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
-        onPress={() =>{
-                  (i == (this.state.objectCount-1))?(
-                    this.setState(prevState => {
-                      return {objectCount: prevState.objectCount + 1, similarObject:false} }) 
-                    ):(
-                         this.removeObject(i)
-                  )
-              }}
-        >
-        {(i == (this.state.objectCount-1))?"Add Object":"Remove Object"}
-        </Button>:<></>}
+        
 			</View>
       
       </>
@@ -251,10 +246,10 @@ var objects = [];
          value = {this.state.spatialActivityText[i]}
       />
         <Button mode="contained"  
-        color={(i == (this.state.spatialActivitiesCount-1))?"#457b9d":"#a41726"}
+        color={(i == 0)?"#457b9d":"#a41726"}
         style={{margin:20,alignContent:'center',justifyContent: 'center'}}
          onPress={() =>{
-                  (i == (this.state.spatialActivitiesCount-1))?(
+                  (i == 0)?(
                     this.setState(prevState => {
                       return {spatialActivitiesCount: prevState.spatialActivitiesCount + 1} }) 
                     ):(
@@ -262,7 +257,7 @@ var objects = [];
                     ) 
               }}
         >
-        {(i == (this.state.spatialActivitiesCount-1))? "Add More" : "Remove"}
+        {(i == 0)? "Add More" : "Remove"}
         </Button>
 			</View>
       
@@ -271,8 +266,33 @@ var objects = [];
 	}
 
   return (
-    
+    <Provider>
+      <Portal>
+    <Modal visible={this.state.visible} contentContainerStyle={containerStyle}>
+      <Text style={{fontSize: 60,fontWeight: 'bold',}}>VoxML Annotation Survey</Text>
+          <TextInput
+              style={{width:500,margin:20}}
+              mode='flat'
+              label= "UID"
+              onChangeText={(text)=>{
+                 this.setState({UID: text})
+              }}
+          />
+          <Button mode="contained"  
+              color={"#457b9d"}
+              style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
+              onPress={() =>{
+                        this.setState({
+                          visible:false
+                        })
+                    }}
+              >
+              Submit
+              </Button>
+        </Modal>
+        </Portal>
     <View style={styles.container}>
+      
       <Text style={styles.titleText}>VoxML Annotation Survey</Text>
       <Image style={styles.tinyLogo} source={require('./Images/'+this.state.image_id+'.jpg')} />
       <View style={{width:500}}>
@@ -305,6 +325,7 @@ var objects = [];
         }}
         value={this.state.FocusActivityText}
       />
+      
       <View >
         <Text style={{fontSize: 20, paddingLeft:25,}}>
           Identify the objects/entities in the scene (including people and animals).<br />
@@ -313,6 +334,16 @@ var objects = [];
           Otherwise, use the next field to indicate what would need to change for that activity to be possible.
         </Text>
         { objects }
+        <Button mode="contained"  
+        color={"#457b9d"}
+        style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
+        onPress={() =>{
+                    this.setState(prevState => {
+                      return {objectCount: prevState.objectCount + 1, similarObject:false} }) 
+              }}
+        >
+        {"Add Object"}
+        </Button>
         <Text style={{fontSize: 20,paddingLeft:25,}}>
           Identify the major spatial and configurational relations between entities in the scene.<br />
           See the provided guideline for sample relations.
@@ -325,10 +356,21 @@ var objects = [];
         style={{margin:20,alignContent:'center',justifyContent: 'center'}}
         onPress={
           ()=>{
-            this.setState({
-              onSubmit:true,
-            })
-            getfirebasedb().ref('/Image/'+this.state.image_id)
+            
+            
+          }
+        }>
+        Submit
+        </Button>
+      </View>
+      <StatusBar style="auto" />
+    </View>
+    </Provider>
+  );
+  }
+  
+  sendDataToFirebase = () => {
+    getfirebasedb().ref('/Image/'+this.state.image_id)
             .set({
               Caption: this.state.captionText,
               FocusActivitiy: this.state.FocusActivityText,
@@ -338,16 +380,13 @@ var objects = [];
               SpatialActivities: JSON.stringify(this.state.spatialActivityText),
             })
             .then(() => console.log('Data set.'));
-          }
-        }>
-        Submit
-        </Button>
-        <Button  mode="contained"  
-        color="#457b9d"
-        onPress={
-          ()=>{
-           
-           this.setState({
+  }
+
+  onSubmit = () => {
+    this.setState({
+              onSubmit:true,
+            })
+      this.setState({
             image_id: Math.floor(Math.random() * Math.floor(105)),
             objectCount:1,
             spatialActivitiesCount:1,
@@ -358,19 +397,7 @@ var objects = [];
             changeInCircumstancesText:[''],
             spatialActivityText:['']
           })
-          }
-        
-      }
-        style={{margin:20,alignContent:'center',justifyContent: 'center'}}>
-        Next
-        </Button>
-      </View>
-      <StatusBar style="auto" />
-    </View>
-  );
-      }
-    
-  
+  }
 }
 export default App;
 const styles = StyleSheet.create({
