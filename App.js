@@ -6,13 +6,16 @@ import {getfirebasedb,fbAuthenticated} from "./config";
 import update from 'react-addons-update';
 
 var similar;
+var previousData = [];
+var currentImageData = [];
+var userID;
 const containerStyle = {alignItems:'center',backgroundColor: 'white', padding: 20, width:"100%",height:"100%"};
 class  App extends Component {
   constructor(props) {  
     super(props);
     this.state = {
       visible:true,
-      image_id:0,
+      image_id:1,
       objectCount:1,
       spatialActivitiesCount:1,
       captionText:'',
@@ -30,9 +33,29 @@ class  App extends Component {
     
   }
 
+  getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+  }
+
   componentDidMount() {
-    this.setState({image_id: Math.floor(Math.random() * Math.floor(105))})
+    this.setState({image_id: this.getRandomInt(1,104)})
+    for(var i=0;i<103;i++){
+      currentImageData[i]=i+1;
+    }
     fbAuthenticated();
+  }
+  removePreviousImageIds(){
+    console.log("Previous images data")
+    for(var i = 0; i<previousData.length;i++){
+      for( var j = 0; j < arr.length; j++){ 
+        if ( currentImageData[i] === previousData[i]) { 
+            currentImageData.splice(j, 1); 
+        }
+      }
+    }
+    console.log("Current Images data"+currentImageData);
   }
 
 renameLabel=(i)=> {
@@ -51,7 +74,6 @@ renameObjectValue=(i)=> {
 	                          	  }
 	                            }
                }))
-    
   }
   var value = this.state.similarObject ? this.state.tempObject :this.state.objectsText[i]
   return (value);
@@ -275,17 +297,45 @@ var objects = [];
               mode='flat'
               label= "UID"
               onChangeText={(text)=>{
-                 this.setState({UID: text})
-              }}
+                  this.setState({UID: text})
+            }}
+            value={this.state.UID}
           />
           <Button mode="contained"  
               color={"#457b9d"}
               style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
               onPress={() =>{
-                        this.setState({
-                          visible:false
-                        })
-                    }}
+                if(this.state.UID){
+                  var refUid = getfirebasedb().ref('/UID/'+ this.state.UID);
+                  if (refUid){
+                      getfirebasedb().ref('/UID/'+ this.state.UID+'/previousImagesData').
+                      once('value').then(function(snapshot) {
+                            snapshot.forEach(function(data) {
+                                previousData.push(data.val());
+                                console.log("Data VAlue"+data.val());
+                                for( var j = 0; j < currentImageData.length; j++){ 
+                                        if ( currentImageData[j] === data.val()) { 
+                                        currentImageData.splice(j, 1);
+                                  }
+                                }
+                            }
+                            );console.log("Current Index::::"+currentImageData);
+                        },this.removePreviousImageIds);
+                        
+                    }    
+                    else{
+                      getfirebasedb().ref('/UID/'+this.state.UID)
+                              .set({
+                                userID: this.state.UID,
+                                previousImagesData: previousData,
+                              })
+                      .then(() => console.log('Data set.'));
+                    }
+                  }
+                  this.setState({
+                      visible:false
+                  })
+                }}
               >
               Submit
               </Button>
