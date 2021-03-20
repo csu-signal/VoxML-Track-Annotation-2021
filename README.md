@@ -1,7 +1,7 @@
 # VoxML-Track-Annotation-2021
 Step 1: Install Node.js and Expo
 
-1. Install Node.js from [this link](https://nodejs.org/en/download/) (Install version 12.x as higher versions have a compatability issue)
+1. Install Node.js from [this link](https://nodejs.org/dist/latest-v12.x/) (Install version 12.x as higher versions have a compatability issue)
 2. Install Expo: `npm install --global expo-cli`
 
 Step 2: Checkout the project
