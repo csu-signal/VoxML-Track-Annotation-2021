@@ -8,7 +8,6 @@ import update from 'react-addons-update';
 var similar;
 var previousData = [];
 var currentImageData = [];
-var userID;
 const containerStyle = {alignItems:'center',backgroundColor: 'white', padding: 20, width:"100%",height:"100%"};
 class  App extends Component {
   constructor(props) {  
@@ -28,7 +27,8 @@ class  App extends Component {
       onSubmit:false,
       tempObject:'',
       similarObject:false,
-      checked:[]
+      checked:[],
+      onButtonClick:false,
     };
     
   }
@@ -40,7 +40,6 @@ class  App extends Component {
   }
 
   componentDidMount() {
-    this.setState({image_id: this.getRandomInt(1,104)})
     for(var i=0;i<103;i++){
       currentImageData[i]=i+1;
     }
@@ -63,7 +62,10 @@ renameLabel=(i)=> {
   var objText = this.state.similarObject ? this.state.tempObject:(this.state.objectsText[i]?this.state.objectsText[i]:"<Object>");
   return ("To "+actText+", "+objText+" must");
 }
-
+getImageID=()=> {
+  var imageData = currentImageData[this.state.image_id]?currentImageData[this.state.image_id]:1;
+  return (require('./Images/'+imageData+'.jpg'));
+}
 renameObjectValue=(i)=> {
   if(similar){
     similar = false
@@ -86,6 +88,8 @@ hasErrors = (text) => {
     }
     return false;
 };
+
+
 
 removeObject = (i) => {
      var tempArray = this.state.objectsText;
@@ -301,57 +305,70 @@ var objects = [];
             }}
             value={this.state.UID}
           />
+          <HelperText type="error" visible={this.state.onButtonClick}>
+            Email address is invalid!
+          </HelperText>
           <Button mode="contained"  
               color={"#457b9d"}
               style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
               onPress={() =>{
-                if(this.state.UID){
-                  var refUid = getfirebasedb().ref('/UID/'+ this.state.UID);
-                  if (refUid){
-                      getfirebasedb().ref('/UID/'+ this.state.UID+'/previousImagesData').
-                      once('value').then(function(snapshot) {
-                            snapshot.forEach(function(data) {
-                                previousData.push(data.val());
-                                console.log("Data VAlue"+data.val());
-                                for( var j = 0; j < currentImageData.length; j++){ 
-                                        if ( currentImageData[j] === data.val()) { 
-                                        currentImageData.splice(j, 1);
+                // this.hasErrorsEmailId();
+                if((this.state.UID.includes('@')&&this.state.UID.includes('.'))){
+                  this.setState({onButtonClick:false});
+                  if(this.state.UID){
+                    var id = this.state.UID
+                    var refUid = getfirebasedb().ref('/UID/'+ id.replace(/[.]/g,','));
+                    if (refUid){
+                        getfirebasedb().ref('/UID/'+ id.replace(/[.]/g,',')+'/previousImagesData').
+                        once('value').then(function(snapshot) {
+                              snapshot.forEach(function(data) {
+                                  previousData.push(data.val());
+                                  console.log("Data VAlue"+data.val());
+                                  for( var j = 0; j < currentImageData.length; j++){ 
+                                          if ( currentImageData[j] === data.val()) { 
+                                          currentImageData.splice(j, 1);
+                                    }
                                   }
-                                }
-                            }
-                            );console.log("Current Index::::"+currentImageData);
-                        },this.removePreviousImageIds);
-                        
-                    }    
-                    else{
-                      getfirebasedb().ref('/UID/'+this.state.UID)
-                              .set({
-                                userID: this.state.UID,
-                                previousImagesData: previousData,
-                              })
-                      .then(() => console.log('Data set.'));
+                              }
+                              );console.log("Current Index::::"+currentImageData);
+                          },this.setState({image_id: this.getRandomInt(0,currentImageData.length)}));
+                      }    
+                      else{
+                        getfirebasedb().ref('/UID/'+id.replace(/./g,','))
+                                .set({
+                                  userID: this.state.UID,
+                                  previousImagesData: previousData,
+                                })
+                        .then(() => this.setState({image_id: this.getRandomInt(0,currentImageData.length)}));
+                      }
                     }
+                    this.setState({
+                        visible:false
+                    })
                   }
-                  this.setState({
-                      visible:false
-                  })
-                }}
+                  else{
+                    this.setState(
+                      {
+                        onButtonClick:true,
+                      }
+                    )
+                  }
+                }
+                }
               >
               Submit
               </Button>
         </Modal>
         </Portal>
     <View style={styles.container}>
-      
-      <Text style={styles.titleText}>VoxML Annotation Survey</Text>
-      <Image style={styles.tinyLogo} source={require('./Images/'+this.state.image_id+'.jpg')} />
+      <Text style={styles.titleText}>VoxML Annotation Survey....{this.state.image_id}...{currentImageData[this.state.image_id]}</Text>
+      <Image style={styles.tinyLogo} source={this.getImageID()} />
       <View style={{width:500}}>
         <Text style={{fontSize: 20,marginLeft:5,marginTop:20}}>
         Provide a brief caption of the image.
         </Text>
       </View>
       <TextInput
-        // ref={(ref) => this.mainInput= ref}
         ref={input => { this.textRef = input }}
         style={{width:500,margin:20}}
         mode='flat'
@@ -406,8 +423,16 @@ var objects = [];
         style={{margin:20,alignContent:'center',justifyContent: 'center'}}
         onPress={
           ()=>{
-            
-            
+            var id=this.state.UID;
+            previousData.push(currentImageData[this.state.image_id]);
+            currentImageData.splice(this.state.image_id,1)
+            getfirebasedb().ref('/UID/'+id.replace(/[.]/g,','))
+                              .set({
+                                userID: this.state.UID,
+                                previousImagesData: previousData,
+                              })
+                      .then(() => this.setState({image_id: this.getRandomInt(0,currentImageData.length)}));
+            console.log("Current Image Data:::"+currentImageData);
           }
         }>
         Submit
