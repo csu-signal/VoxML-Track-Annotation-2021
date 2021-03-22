@@ -25,8 +25,7 @@ class  App extends Component {
       changeInCircumstancesText:[''],
       spatialActivityText:[''],
       onSubmit:false,
-      tempObject:'',
-      similarObject:false,
+      similarObjects:[false],
       checked:[],
       onButtonClick:false,
     };
@@ -59,26 +58,12 @@ class  App extends Component {
 
 renameLabel=(i)=> {
   var actText = this.state.activityText[i]?this.state.activityText[i]:"<Activity>";
-  var objText = this.state.similarObject ? this.state.tempObject:(this.state.objectsText[i]?this.state.objectsText[i]:"<Object>");
+  var objText = this.state.objectsText[i]?this.state.objectsText[i]:"<Object>";
   return ("To "+actText+", "+objText+" must");
 }
 getImageID=()=> {
   var imageData = currentImageData[this.state.image_id]?currentImageData[this.state.image_id]:1;
   return (require('./Images/'+imageData+'.jpg'));
-}
-renameObjectValue=(i)=> {
-  if(similar){
-    similar = false
-    this.setState(update(this.state, {
-	                objectsText: {
-		                          [i]: {
-			                            $set: this.state.tempObject
-	                          	  }
-	                            }
-               }))
-  }
-  var value = this.state.similarObject ? this.state.tempObject :this.state.objectsText[i]
-  return (value);
 }
 
 
@@ -110,13 +95,24 @@ removeObject = (i) => {
 
 insertObject = (i) => {     
   var tempArray = this.state.objectsText;
+  var tempSimilarObjects = this.state.similarObjects;
+  tempSimilarObjects.splice(i+1,0,true);
   tempArray.splice(i,0,this.state.objectsText[i]);
   this.setState({
 	  objectsText: tempArray,
+    similarObjects: tempSimilarObjects
   });
+  this.setState(update(this.state, {
+	                changeInCircumstancesText: {
+		                          [i+1]: {
+			                            $set: ''
+	                          	  }
+	                            },
+          }));
   this.setState(prevState => {
       return {objectCount: prevState.objectCount + 1} 
   });
+  console.log("Similar Objects:::",this.state.similarObjects)
 };
 
 
@@ -130,6 +126,7 @@ removeSpatialActivity = (i) => {
         return {spatialActivitiesCount: prevState.spatialActivitiesCount - 1} 
     });
 };
+
 showModal = () => {this.setState({
   visible:true
 })};
@@ -145,20 +142,11 @@ var objects = [];
 			<View  style={{
         flexDirection: 'row',margin:5}} key = {i}>
           <>
-				{this.state.objectsText[i] == this.state.objectsText[i-1]? <View style={{width:250,margin:20}}></View>:(<TextInput
+				{(this.state.similarObjects[i]) ? <View style={{width:250,margin:20}}></View>:(<TextInput
           style={{width:250,margin:20}}
           mode='flat'
           label="Object"
-          onChangeText={(text)=>{
-            (this.state.similarObject ? (
-              this.setState(update(this.state, {
-	                objectsText: {
-		                          [i]: {
-			                            $set: this.state.tempObject
-	                          	  }
-	                            }
-               }))  
-            ):(
+          onChangeText={(text)=>{(
               this.setState(update(this.state, {
 	                objectsText: {
 		                          [i]: {
@@ -166,7 +154,7 @@ var objects = [];
 	                          	  }
 	                            }
           }))
-            ));
+            )
           }}
           value = {this.state.objectsText[i]}
         />)}
@@ -232,17 +220,17 @@ var objects = [];
         Empty Text
         </HelperText>
         <Button mode="contained"  
-        color={(i == 0)?"#457b9d":"#a41726"}
+        color={(!this.state.similarObjects[i])?"#457b9d":"#a41726"}
         style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
         onPress={() =>{
-                  ((i == (0))?(
+                  ((!this.state.similarObjects[i])?(
                     this.insertObject(i)
                    ) :(
                       this.removeObject(i)
                     ));
               }}
         >
-        {(i == 0)?"Add activity":"Remove"}
+        {(!this.state.similarObjects[i])?"Add activity":"Remove"}
         </Button>
         
 			</View>
@@ -405,8 +393,21 @@ var objects = [];
         color={"#457b9d"}
         style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
         onPress={() =>{
+                    var count = this.state.objectCount;
+                    this.setState(update(this.state, {
+	                      changeInCircumstancesText: {
+		                          [count]: {
+			                            $set: ''
+	                          	  }
+	                            },
+                          similarObjects:{
+                            [count]:{
+                              $set:false
+                            }
+                          }
+                        }));
                     this.setState(prevState => {
-                      return {objectCount: prevState.objectCount + 1, similarObject:false} }) 
+                      return {objectCount: prevState.objectCount + 1} });
               }}
         >
         {"Add Object"}
@@ -431,8 +432,7 @@ var objects = [];
                                 userID: this.state.UID,
                                 previousImagesData: previousData,
                               })
-                      .then(() => this.setState({image_id: this.getRandomInt(0,currentImageData.length)}));
-            console.log("Current Image Data:::"+currentImageData);
+            this.sendDataToFirebase();
           }
         }>
         Submit
@@ -445,34 +445,47 @@ var objects = [];
   }
   
   sendDataToFirebase = () => {
-    getfirebasedb().ref('/Image/'+this.state.image_id)
+    getfirebasedb().ref('/Image/'+currentImageData[this.state.image_id])
             .set({
               Caption: this.state.captionText,
               FocusActivitiy: this.state.FocusActivityText,
-              Objects: JSON.stringify(this.state.objectsText),
-              DepictedActivity: JSON.stringify(this.state.activityText),
-              ChangeInCircumstances: JSON.stringify(this.state.changeInCircumstancesText),
-              SpatialActivities: JSON.stringify(this.state.spatialActivityText),
-            })
-            .then(() => console.log('Data set.'));
+              Objects: this.state.objectsText,
+              DepictedActivity: this.state.activityText,
+              ChangeInCircumstances: this.state.changeInCircumstancesText,
+              SpatialActivities: this.state.spatialActivityText,
+    }).then(() => this.setState({
+      image_id: this.getRandomInt(0,currentImageData.length),
+      objectCount:1,
+      spatialActivitiesCount:1,
+      captionText:'',
+      FocusActivityText:'',
+      objectsText:[''],
+      activityText:[''],
+      changeInCircumstancesText:[''],
+      spatialActivityText:[''],
+      checked:[],
+      similarObjects:[false]
+    
+    }));
   }
 
-  onSubmit = () => {
-    this.setState({
-              onSubmit:true,
-            })
-      this.setState({
-            image_id: Math.floor(Math.random() * Math.floor(105)),
-            objectCount:1,
-            spatialActivitiesCount:1,
-            captionText:'',
-            FocusActivityText:'',
-            objectsText:[''],
-            activityText:[''],
-            changeInCircumstancesText:[''],
-            spatialActivityText:['']
-          })
-  }
+  // onSubmit = () => {
+  //   this.setState({
+  //             onSubmit:true,
+  //           })
+  //     this.setState({
+  //           image_id: Math.floor(Math.random() * Math.floor(105)),
+  //           objectCount:1,
+  //           spatialActivitiesCount:1,
+  //           captionText:'',
+  //           FocusActivityText:'',
+  //           objectsText:[''],
+  //           activityText:[''],
+  //           changeInCircumstancesText:[''],
+  //           spatialActivityText:[''],
+  //           checked:[],
+  //         })
+  // }
 }
 export default App;
 const styles = StyleSheet.create({
