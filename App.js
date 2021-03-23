@@ -102,13 +102,13 @@ insertObject = (i) => {
 	  objectsText: tempArray,
     similarObjects: tempSimilarObjects
   });
-  this.setState(update(this.state, {
-	                changeInCircumstancesText: {
-		                          [i+1]: {
-			                            $set: ''
-	                          	  }
-	                            },
-          }));
+  // this.setState(update(this.state, {
+	//                 changeInCircumstancesText: {
+	// 	                          [i+1]: {
+	// 		                            $set: ''
+	//                           	  }
+	//                             },
+  //         }));
   this.setState(prevState => {
       return {objectCount: prevState.objectCount + 1} 
   });
@@ -190,6 +190,11 @@ var objects = [];
 		                          [i]: {
 			                            $set: !this.state.checked[i]
 	                          	  }
+	                            },
+                  changeInCircumstancesText: {
+		                          [i]: {
+			                            $set: ''
+	                          	  }
 	                            }
                })) 
             }}
@@ -204,7 +209,7 @@ var objects = [];
         label={
             this.renameLabel(i)
         }
-        disabled = {!this.state.checked[i]}
+        disabled = {this.state.checked[i]}
         onChangeText={(text)=>{
           this.setState(update(this.state, {
 	                changeInCircumstancesText: {
@@ -395,11 +400,11 @@ var objects = [];
         onPress={() =>{
                     var count = this.state.objectCount;
                     this.setState(update(this.state, {
-	                      changeInCircumstancesText: {
-		                          [count]: {
-			                            $set: ''
-	                          	  }
-	                            },
+	                      // changeInCircumstancesText: {
+		                    //       [count]: {
+			                  //           $set: ''
+	                      //     	  }
+	                      //       },
                           similarObjects:{
                             [count]:{
                               $set:false
@@ -435,7 +440,7 @@ var objects = [];
             this.sendDataToFirebase();
           }
         }>
-        Submit
+        Submit & Next
         </Button>
       </View>
       <StatusBar style="auto" />
@@ -445,7 +450,8 @@ var objects = [];
   }
   
   sendDataToFirebase = () => {
-    getfirebasedb().ref('/Image/'+currentImageData[this.state.image_id])
+    var id = this.state.UID;
+    getfirebasedb().ref('/Image/'+currentImageData[this.state.image_id]+"-"+id.replace(/[.]/g,','))
             .set({
               Caption: this.state.captionText,
               FocusActivitiy: this.state.FocusActivityText,
