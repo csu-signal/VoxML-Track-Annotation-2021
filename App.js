@@ -26,7 +26,7 @@ class  App extends Component {
       spatialActivityText:[''],
       onSubmit:false,
       similarObjects:[false],
-      checked:[],
+      checked:[false],
       onButtonClick:false,
     };
     
@@ -74,19 +74,20 @@ hasErrors = (text) => {
     return false;
 };
 
-
-
 removeObject = (i) => {
      var tempArray = this.state.objectsText;
      var tempArray2 = this.state.activityText;
      var tempArray3= this.state.changeInCircumstancesText;
+     var tempArray4= this.state.checked;
      tempArray.splice(i,1);
      tempArray2.splice(i,1);
      tempArray3.splice(i,1);
+     tempArray4.splice(i,1);
     this.setState({
 	                objectsText: tempArray,
                   actText: tempArray2,
                   changeInCircumstancesText: tempArray3,
+                  checked:tempArray4
     });
      this.setState(prevState => {
           return {objectCount: prevState.objectCount - 1} 
@@ -96,23 +97,27 @@ removeObject = (i) => {
 insertObject = (i) => {     
   var tempArray = this.state.objectsText;
   var tempSimilarObjects = this.state.similarObjects;
+  var tempChecked = this.state.checked;
+  tempChecked.splice(tempChecked.length,0,false);
+  console.log("TempChecked:",tempChecked);
   tempSimilarObjects.splice(i+1,0,true);
   tempArray.splice(i,0,this.state.objectsText[i]);
   this.setState({
 	  objectsText: tempArray,
-    similarObjects: tempSimilarObjects
+    similarObjects: tempSimilarObjects,
+    checked: tempChecked
   });
   // this.setState(update(this.state, {
-	//                 changeInCircumstancesText: {
+	//                 checked: {
 	// 	                          [i+1]: {
-	// 		                            $set: ''
+	// 		                            $set: false
 	//                           	  }
 	//                             },
   //         }));
   this.setState(prevState => {
       return {objectCount: prevState.objectCount + 1} 
   });
-  console.log("Similar Objects:::",this.state.similarObjects)
+  console.log("checked :::",this.state.checked)
 };
 
 
@@ -159,7 +164,7 @@ var objects = [];
           value = {this.state.objectsText[i]}
         />)}
         <HelperText type= "error" visible={this.hasErrors(this.state.objectsText[i])}>
-              Empty Text
+          please enter object
         </HelperText>
         </>
 
@@ -178,6 +183,9 @@ var objects = [];
         }}
         value = {this.state.activityText[i]}
         />
+        <HelperText type="error" visible={this.hasErrors(this.state.activityText[i])}>
+          Please enter activity
+        </HelperText>
         <View style={{alignItems:"center",justifyContent:"center"}}>
         <Text style={{fontSize: 18,paddingLeft:25,}}>
         Shown In Scene
@@ -200,9 +208,7 @@ var objects = [];
             }}
         />
         </View>
-        <HelperText type="error" visible={this.hasErrors(this.state.activityText[i])}>
-        Empty Text
-        </HelperText>
+        
         <TextInput
         style={{width:250,margin:20}}
         mode='flat'
@@ -221,9 +227,9 @@ var objects = [];
         }}
         value = {this.state.changeInCircumstancesText[i]}
         />
-        <HelperText type="error" visible={this.hasErrors(this.state.changeInCircumstancesText[i])}>
-        Empty Text
-        </HelperText>
+        {(this.state.checked[i])?(<></>):(<HelperText type="error" visible={this.hasErrors(this.state.changeInCircumstancesText[i])}>
+        Please enter change in circumstances
+        </HelperText>)}
         <Button mode="contained"  
         color={(!this.state.similarObjects[i])?"#457b9d":"#a41726"}
         style={{margin:20,width:150,height:50,alignContent:'center',justifyContent: 'center'}}
@@ -264,6 +270,9 @@ var objects = [];
         }}
          value = {this.state.spatialActivityText[i]}
       />
+      <HelperText type= "error" visible={this.hasErrors(this.state.spatialActivityText[i])}>
+        Please enter spatial relation
+      </HelperText>
         <Button mode="contained"  
         color={(i == 0)?"#457b9d":"#a41726"}
         style={{margin:20,alignContent:'center',justifyContent: 'center'}}
@@ -371,6 +380,9 @@ var objects = [];
         }}
         value={this.state.captionText}
       />
+      <HelperText type= "error" visible={this.hasErrors(this.state.captionText)}>
+        Please enter caption
+      </HelperText>
       <View style={{width:500}}>
         <Text style={{fontSize: 20,marginLeft:5,marginTop:20}}>
         What activity (if any) is the focus of the scene?
@@ -385,7 +397,9 @@ var objects = [];
         }}
         value={this.state.FocusActivityText}
       />
-      
+      <HelperText type= "error" visible={this.hasErrors(this.state.FocusActivityText)}>
+        Please enter focus activity
+      </HelperText>
       <View >
         <Text style={{fontSize: 20, paddingLeft:25,}}>
           Identify the objects/entities in the scene (including people and animals).<br />
@@ -400,11 +414,11 @@ var objects = [];
         onPress={() =>{
                     var count = this.state.objectCount;
                     this.setState(update(this.state, {
-	                      // changeInCircumstancesText: {
-		                    //       [count]: {
-			                  //           $set: ''
-	                      //     	  }
-	                      //       },
+	                      checked: {
+		                          [count]: {
+			                            $set: false
+	                          	  }
+	                            },
                           similarObjects:{
                             [count]:{
                               $set:false
@@ -429,15 +443,20 @@ var objects = [];
         style={{margin:20,alignContent:'center',justifyContent: 'center'}}
         onPress={
           ()=>{
-            var id=this.state.UID;
-            previousData.push(currentImageData[this.state.image_id]);
-            
-            getfirebasedb().ref('/UID/'+id.replace(/[.]/g,','))
-                              .set({
-                                userID: this.state.UID,
-                                previousImagesData: previousData,
-                              })
-            this.sendDataToFirebase();
+            this.setState({
+              onSubmit:true,
+            })
+            if(this.checkIfFormIsComplete()){
+              console.log("Check if form is complete:",this.checkIfFormIsComplete());
+              var id=this.state.UID;
+              previousData.push(currentImageData[this.state.image_id]);
+              getfirebasedb().ref('/UID/'+id.replace(/[.]/g,','))
+                                .set({
+                                  userID: this.state.UID,
+                                  previousImagesData: previousData,
+                                })
+              this.sendDataToFirebase();
+            }
           }
         }>
         Submit & Next
@@ -447,6 +466,26 @@ var objects = [];
     </View>
     </Provider>
   );
+  }
+
+  checkIfFormIsComplete=()=>{
+    if(this.state.captionText != '' && this.state.FocusActivityText!= ''){
+      for(var i=0;i<this.state.objectsText.length;i++){
+        if(this.state.objectsText[i] == '' || this.state.activityText[i]==''){
+          return false
+        }
+        if(!this.state.checked[i] && this.state.changeInCircumstancesText[i]==''){
+          return false
+        }
+      }
+      for(var i=0;i<this.state.spatialActivityText.length;i++){
+        if(this.state.spatialActivityText[i] == ''){
+          return false
+        }
+      }
+      return true
+    }
+    return false;
   }
   
   sendDataToFirebase = () => {
@@ -470,29 +509,11 @@ var objects = [];
       changeInCircumstancesText:[''],
       spatialActivityText:[''],
       checked:[],
-      similarObjects:[false]
-    
+      similarObjects:[false],
+      onSubmit:false
     }));
     currentImageData.splice(this.state.image_id,1);
   }
-
-  // onSubmit = () => {
-  //   this.setState({
-  //             onSubmit:true,
-  //           })
-  //     this.setState({
-  //           image_id: Math.floor(Math.random() * Math.floor(105)),
-  //           objectCount:1,
-  //           spatialActivitiesCount:1,
-  //           captionText:'',
-  //           FocusActivityText:'',
-  //           objectsText:[''],
-  //           activityText:[''],
-  //           changeInCircumstancesText:[''],
-  //           spatialActivityText:[''],
-  //           checked:[],
-  //         })
-  // }
 }
 export default App;
 const styles = StyleSheet.create({
