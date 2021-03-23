@@ -431,7 +431,7 @@ var objects = [];
           ()=>{
             var id=this.state.UID;
             previousData.push(currentImageData[this.state.image_id]);
-            currentImageData.splice(this.state.image_id,1)
+            
             getfirebasedb().ref('/UID/'+id.replace(/[.]/g,','))
                               .set({
                                 userID: this.state.UID,
@@ -473,6 +473,7 @@ var objects = [];
       similarObjects:[false]
     
     }));
+    currentImageData.splice(this.state.image_id,1);
   }
 
   // onSubmit = () => {
