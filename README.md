@@ -16,4 +16,6 @@ Step 3: Install NPM and start Expo
 
 This should open the project in a web browser.  On the left side panel click on "**Run in web browser**".
 
+You will be asked to enter an email address as a unique ID.  This will be kept completely private and will only be used to track which images you have already annotated (read more in the guideline).
+
 Read the guideline and get started!
