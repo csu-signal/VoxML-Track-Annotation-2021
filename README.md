@@ -18,4 +18,4 @@ This should open the project in a web browser.  On the left side panel click on 
 
 You will be asked to enter an email address as a unique ID.  This will be kept completely private and will only be used to track which images you have already annotated (read more in the guideline).
 
-Read the guideline and get started!
+[Read the guideline](https://github.com/csu-signal/VoxML-Track-Annotation-2021/blob/main/ISA-17-guideline.pdf) and get started!
