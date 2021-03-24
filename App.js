@@ -8,6 +8,7 @@ import update from 'react-addons-update';
 var similar;
 var previousData = [];
 var currentImageData = [];
+const imageCount = 103;
 const containerStyle = {alignItems:'center',backgroundColor: 'white', padding: 20, width:"100%",height:"100%"};
 class  App extends Component {
   constructor(props) {  
@@ -28,6 +29,7 @@ class  App extends Component {
       similarObjects:[false],
       checked:[false],
       onButtonClick:false,
+      finishedAllForms:false,
     };
     
   }
@@ -39,7 +41,7 @@ class  App extends Component {
   }
 
   componentDidMount() {
-    for(var i=0;i<103;i++){
+    for(var i=0;i<imageCount;i++){
       currentImageData[i]=i+1;
     }
     fbAuthenticated();
@@ -325,15 +327,16 @@ var objects = [];
                         once('value').then(function(snapshot) {
                               snapshot.forEach(function(data) {
                                   previousData.push(data.val());
-                                  console.log("Data VAlue"+data.val());
+                                  
                                   for( var j = 0; j < currentImageData.length; j++){ 
                                           if ( currentImageData[j] === data.val()) { 
                                           currentImageData.splice(j, 1);
                                     }
                                   }
                               }
-                              );console.log("Current Index::::"+currentImageData);
-                          },this.setState({image_id: this.getRandomInt(0,currentImageData.length)}));
+                              );
+                          },  this.setState({image_id: this.getRandomInt(0,currentImageData.length)})
+                          );
                       }    
                       else{
                         getfirebasedb().ref('/UID/'+id.replace(/./g,','))
@@ -362,8 +365,13 @@ var objects = [];
               </Button>
         </Modal>
         </Portal>
+        <Portal>
+        <Modal visible={this.state.finishedAllForms} contentContainerStyle={containerStyle}>
+            <Text style={{fontSize: 60,fontWeight: 'bold',}}>Finished Submitting All Forms.Thank You</Text>
+        </Modal>
+        </Portal>
     <View style={styles.container}>
-      <Text style={styles.titleText}>VoxML Annotation Survey....{this.state.image_id}...{currentImageData[this.state.image_id]}</Text>
+      <Text style={styles.titleText}>VoxML Annotation Survey</Text>
       <Image style={styles.tinyLogo} source={this.getImageID()} />
       <View style={{width:500}}>
         <Text style={{fontSize: 20,marginLeft:5,marginTop:20}}>
@@ -426,7 +434,7 @@ var objects = [];
                           }
                         }));
                     this.setState(prevState => {
-                      return {objectCount: prevState.objectCount + 1} });
+                      return {objectCount: prevState.objectCount + 1}});
               }}
         >
         {"Add Object"}
@@ -447,9 +455,14 @@ var objects = [];
               onSubmit:true,
             })
             if(this.checkIfFormIsComplete()){
-              console.log("Check if form is complete:",this.checkIfFormIsComplete());
               var id=this.state.UID;
               previousData.push(currentImageData[this.state.image_id]);
+              if(previousData.length == imageCount){
+                this.setState({
+                  finishedAllForms:true
+                })
+              }
+              
               getfirebasedb().ref('/UID/'+id.replace(/[.]/g,','))
                                 .set({
                                   userID: this.state.UID,
@@ -466,6 +479,14 @@ var objects = [];
     </View>
     </Provider>
   );
+  }
+  checkAllFormsComplete=()=>{
+    this.setState({image_id: this.getRandomInt(0,currentImageData.length)})
+    if(previousData.length == imageCount){
+      this.setState({
+        finishedAllForms:true
+      })
+    }
   }
 
   checkIfFormIsComplete=()=>{
@@ -489,6 +510,7 @@ var objects = [];
   }
   
   sendDataToFirebase = () => {
+    console.log(this.state.finishedAllForms);
     var id = this.state.UID;
     getfirebasedb().ref('/Image/'+currentImageData[this.state.image_id]+"-"+id.replace(/[.]/g,','))
             .set({
