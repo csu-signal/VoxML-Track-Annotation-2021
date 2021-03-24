@@ -11,7 +11,7 @@ Step 2: Checkout the project
 
 Step 3: Install NPM and start Expo
 
-1. Run `npm install` (If this throws errors then run `sudo npm install` on \*nix or restart your Windows command line with admin privileges)
+1. Run `npm install` (If this throws errors then run `sudo npm install` on macOS/Linux, or restart your Windows command line with admin privileges)
 2. Run `expo start`
 
 This should open the project in a web browser.  On the left side panel click on "**Run in web browser**".
