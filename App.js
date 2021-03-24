@@ -306,7 +306,7 @@ var objects = [];
           <TextInput
               style={{width:500,margin:20}}
               mode='flat'
-              label= "UID"
+              label= "Please enter a unique ID (a valid email address)"
               onChangeText={(text)=>{
                   this.setState({UID: text})
             }}
@@ -365,7 +365,7 @@ var objects = [];
                 }
                 }
               >
-              Submit
+              Enter
               </Button>
         </Modal>
         </Portal>
@@ -476,7 +476,7 @@ var objects = [];
             }
           }
         }>
-        Submit & Next
+        Submit & Go to Next
         </Button>
       </View>
       <StatusBar style="auto" />
