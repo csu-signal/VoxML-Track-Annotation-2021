@@ -15,3 +15,5 @@ Step 3: Install NPM and start Expo
 2. Run `expo start`
 
 This should open the project in a web browser.  On the left side panel click on "**Run in web browser**".
+
+Read the guideline and get started!
