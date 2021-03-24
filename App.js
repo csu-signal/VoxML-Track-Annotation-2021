@@ -361,7 +361,7 @@ var objects = [];
                 }
                 }
               >
-              Submit
+              Enter
               </Button>
         </Modal>
         </Portal>
