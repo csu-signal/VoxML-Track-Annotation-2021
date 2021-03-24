@@ -472,7 +472,7 @@ var objects = [];
             }
           }
         }>
-        Submit & Next
+        Submit & Go to Next
         </Button>
       </View>
       <StatusBar style="auto" />
