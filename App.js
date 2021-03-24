@@ -303,7 +303,7 @@ var objects = [];
           <TextInput
               style={{width:500,margin:20}}
               mode='flat'
-              label= "UID"
+              label= "Please enter a unique ID (a valid email address)"
               onChangeText={(text)=>{
                   this.setState({UID: text})
             }}
