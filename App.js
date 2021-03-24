@@ -367,7 +367,7 @@ var objects = [];
         </Portal>
         <Portal>
         <Modal visible={this.state.finishedAllForms} contentContainerStyle={containerStyle}>
-            <Text style={{fontSize: 60,fontWeight: 'bold',}}>Finished Submitting All Forms.Thank You</Text>
+            <Text style={{fontSize: 60,fontWeight: 'bold',}}>Finished Submitting All Forms. Thank You</Text>
         </Modal>
         </Portal>
     <View style={styles.container}>
