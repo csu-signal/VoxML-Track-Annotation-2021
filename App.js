@@ -5,10 +5,10 @@ import {TextInput, Button,HelperText,Checkbox,Modal,Provider,Portal} from 'react
 import {getfirebasedb,fbAuthenticated} from "./config";
 import update from 'react-addons-update';
 
-var similar;
 var previousData = [];
 var currentImageData = [];
 const imageCount = 103;
+var tempCheck = true;
 const containerStyle = {alignItems:'center',backgroundColor: 'white', padding: 20, width:"100%",height:"100%"};
 class  App extends Component {
   constructor(props) {  
@@ -46,6 +46,16 @@ class  App extends Component {
     }
     fbAuthenticated();
   }
+
+  componentDidUpdate() {
+    if (tempCheck && (previousData.length === imageCount)) {
+        this.setState({
+        finishedAllForms:true
+      })
+      tempCheck = false
+    }
+  }
+
   removePreviousImageIds(){
     console.log("Previous images data")
     for(var i = 0; i<previousData.length;i++){
@@ -109,13 +119,6 @@ insertObject = (i) => {
     similarObjects: tempSimilarObjects,
     checked: tempChecked
   });
-  // this.setState(update(this.state, {
-	//                 checked: {
-	// 	                          [i+1]: {
-	// 		                            $set: false
-	//                           	  }
-	//                             },
-  //         }));
   this.setState(prevState => {
       return {objectCount: prevState.objectCount + 1} 
   });
@@ -327,7 +330,6 @@ var objects = [];
                         once('value').then(function(snapshot) {
                               snapshot.forEach(function(data) {
                                   previousData.push(data.val());
-                                  
                                   for( var j = 0; j < currentImageData.length; j++){ 
                                           if ( currentImageData[j] === data.val()) { 
                                           currentImageData.splice(j, 1);
@@ -344,7 +346,9 @@ var objects = [];
                                   userID: this.state.UID,
                                   previousImagesData: previousData,
                                 })
-                        .then(() => this.setState({image_id: this.getRandomInt(0,currentImageData.length)}));
+                        .then(() => this.setState(
+                          {image_id: this.getRandomInt(0,currentImageData.length),
+                          }));
                       }
                     }
                     this.setState({
@@ -367,7 +371,7 @@ var objects = [];
         </Portal>
         <Portal>
         <Modal visible={this.state.finishedAllForms} contentContainerStyle={containerStyle}>
-            <Text style={{fontSize: 60,fontWeight: 'bold',}}>Finished Submitting All Forms.Thank You</Text>
+        <Text style={{fontSize: 60,fontWeight: 'bold',}}>You have finished all forms. Thank you</Text>
         </Modal>
         </Portal>
     <View style={styles.container}>
