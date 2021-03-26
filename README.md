@@ -25,5 +25,7 @@ Please [**read the guideline first**](https://github.com/csu-signal/VoxML-Track-
 We recommend running the tool on Mac or Linux.  The interface has been tested in Chrome on Windows as well and should work.
 
 In the event that running `expo start` and clicking on "**Run in web browser**" doesn't automatically open a new browser window that redirects to the **VoxML Annotation Survey** interface, you should look in the command line output for a line like:
-  `Project is running at http://0.0.0.0:XXXXX`
+
+`Project is running at http://0.0.0.0:XXXXX`
+
 where `XXXXX` is a port number.  Open a new Chrome window and navigate to `localhost:XXXXX`.
