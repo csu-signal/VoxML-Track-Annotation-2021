@@ -19,3 +19,8 @@ This should open the project in a web browser.  On the left side panel click on 
 You will be asked to enter an email address as a unique ID.  This will be kept completely private and will only be used to track which images you have already annotated (read more in the guideline).
 
 Please [**read the guideline first**](https://github.com/csu-signal/VoxML-Track-Annotation-2021/blob/main/ISA-17-guideline.pdf) and get started!
+
+## Installation notes
+
+We recommend running the tool on Mac or Linux.  It has been tested in Chrome on Windows as well and should work.  In the event that running `expo start` and clicking on "**Run in web browser**" doesn't automatically open a new browser window that redirects to the **VoxML Annotation Survey** interface, you should look in the command line output for line like:
+`Project is running at http://0.0.0.0:XXXXX` where `XXXXX` is a port number.  Open a new Chrome window and navigate to `localhost:XXXXX`.
